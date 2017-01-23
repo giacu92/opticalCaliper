@@ -33,6 +33,6 @@ public:
     int32_t read(void);        // returns the read byte
     double mmRead(void);    // returns the read value in millimeters
     double inRead(void);    // returns the read value in inches
-}
+};
 
 #endif /* opticalCaliper_h */
