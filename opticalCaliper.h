@@ -12,7 +12,7 @@
 #include "Arduino.h"
 
 #define const1 494914
-#define const2 99.22
+#define const2 99.22e-4
 
 class opticalCaliper {
 
