@@ -19,8 +19,16 @@ void loop()
   int32_t data   = caliper.read();
 
   // Printing values:
-  Serial.println("distance in mm: " + mmValue + " mm");
-  Serial.println("distance in in: " + inValue + " in");
+  Serial.print("distance in mm: ");
+  Serial.print(mmValue);
+  Serial.println(" mm");
+  
+  Serial.print("distance in in: ");
+  Serial.print(inValue);
+  Serial.println(" in");
+
   Serial.print("bytes read: ");
   Serial.println(data, BIN);
+
+  delay(1000);
 }
