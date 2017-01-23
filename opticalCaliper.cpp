@@ -46,12 +46,12 @@ int opticalCaliper::getDataPin(void)
     return this->dataPin;
 }
 
-byte opticalCaliper::read(void)
+int32_t opticalCaliper::read(void)
 {
     this->reading = 0; // azzeramanto
-    double tempMicros = micros();
+    unsigned long tempMicros = micros();
     
-    do{}while(digitalRead(clockPin) == LOW);
+    do{}    while(digitalRead(clockPin) == LOW);
     
     if(micros() - tempMicros > 3000) // se mi trovo al primo impulso del treno avvio la lettura altrimenti salto
     {
@@ -62,12 +62,23 @@ byte opticalCaliper::read(void)
             {
                 bitSet(reading, i);
             }
-            do{}while(digitalRead(clockPin) == LOW);       // attendo il prossimo impulso di clock
+            do{}    while(digitalRead(clockPin) == LOW);       // attendo il prossimo impulso di clock
         }
-        value2 = (494914 - reading) / 100.00 * 0.9922;
+        //value2 = (494914 - reading) / 100.00 * 0.9922;
+        return this->reading;
     }  
     else
     {
         read();
     }
+}
+
+double opticalCaliper::mmRead()
+{
+    return (double)((const1 - this->read()) * const2);
+}
+
+double opticalCaliper::inRead()
+{
+    return (double)(this->mmRead()/25.4);
 }

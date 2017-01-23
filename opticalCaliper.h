@@ -11,15 +11,15 @@
 
 #include "Arduino.h"
 
-#define const1 = 494914
-#define const2 = 99.22
+#define const1 494914
+#define const2 99.22
 
 class opticalCaliper {
 
 private:
     int clockPin = 0;   // default clockPin = 4
     int dataPin  = 0;   // default dataPin  = 5
-    byte reading = 0x00;
+    int32_t reading = 0x00;
     
 public:
     opticalCaliper();
@@ -30,10 +30,9 @@ public:
     int  getClockPin(void);
     int  getDataPin (void);
     
-    byte read(void);        // returns the read byte
+    int32_t read(void);        // returns the read byte
     double mmRead(void);    // returns the read value in millimeters
     double inRead(void);    // returns the read value in inches
-    
 }
 
 #endif /* opticalCaliper_h */

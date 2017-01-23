@@ -1,0 +1,22 @@
+#######################################
+# Syntax Coloring Map LTC236X
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LTC236X	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+opticalCaliper	KEYWORD2
+serClockPin	KEYWORD2
+setDataPin	KEYWORD2
+getClockPin	KEYWORD2
+getDataPin	KEYWORD2
+read	KEYWORD2
+mmRead	KEYWORD2
+inRead	KEYWORD2
