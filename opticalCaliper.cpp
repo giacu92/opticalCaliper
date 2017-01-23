@@ -10,7 +10,7 @@
 
 opticalCaliper::opticalCaliper()
 {
-    pinMode(clockPin, OUTPUT);
+    pinMode(clockPin, INPUT);
     pinMode(dataPin,  OUTPUT);
     
     this->clockPin = 4;
