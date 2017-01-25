@@ -26,11 +26,11 @@ private:
     unsigned long break_time = 0;
     int counter = 0;
     
-    void readInterrupt(void);
-    
 public:
     opticalCaliper();
     opticalCaliper(int ckPin, int DataPin);
+    
+    void readInterrupt(void);
     
     void setClockPin(int ckPin  );
     void setDataPin (int DataPin);
