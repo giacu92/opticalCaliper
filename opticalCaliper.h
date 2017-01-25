@@ -38,11 +38,12 @@ public:
     int  getDataPin (void);
     
     int32_t read(void);    // returns the read bytes
-    void readISR(void);       // uses ISR to read bytes
     
     double mmRead (void);    // returns the read value in millimeters
     double inRead (void);    // returns the read value in inches
     double mmReadInt(void);
 };
+
+//static void readInterrupt(void);
 
 #endif /* opticalCaliper_h */
