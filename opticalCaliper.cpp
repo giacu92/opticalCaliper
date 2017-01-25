@@ -17,8 +17,6 @@ opticalCaliper::opticalCaliper()
     this->dataPin  = 5;
     
     this->break_time = 3000;
-    
-    attachInterrupt(digitalPinToInterrupt(this->clockPin), this->readInterrupt, FALLING);
 }
 
 opticalCaliper::opticalCaliper(int ckPin, int DataPin)
@@ -27,8 +25,6 @@ opticalCaliper::opticalCaliper(int ckPin, int DataPin)
     
     this->clockPin = ckPin;
     this->dataPin  = DataPin;
-    
-    attachInterrupt(digitalPinToInterrupt(this->clockPin), this->readInterrupt, FALLING);
 }
 
 void opticalCaliper::setClockPin(int ckPin)
