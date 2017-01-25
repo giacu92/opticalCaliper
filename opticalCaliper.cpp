@@ -16,6 +16,9 @@ opticalCaliper::opticalCaliper()
     this->clockPin = 4;
     this->dataPin  = 5;
     
+    this->break_time = 3000;
+    
+    attachInterrupt(digitalPinToInterrupt(this->clockPin, readInterrupt(), FALLING);
 }
 
 opticalCaliper::opticalCaliper(int ckPin, int DataPin)
@@ -24,6 +27,8 @@ opticalCaliper::opticalCaliper(int ckPin, int DataPin)
     
     this->clockPin = ckPin;
     this->dataPin  = DataPin;
+    
+    attachInterrupt(digitalPinToInterrupt(this->getClockPin, readInterrupt(), FALLING);
 }
 
 void opticalCaliper::setClockPin(int ckPin)
@@ -53,7 +58,7 @@ int32_t opticalCaliper::read(void)
     
     do{}    while(digitalRead(clockPin) == LOW);
     
-    if(micros() - tempMicros > 3000) // se mi trovo al primo impulso del treno avvio la lettura altrimenti salto
+    if(micros() - tempMicros > break_time) // se mi trovo al primo impulso del treno avvio la lettura altrimenti salto
     {
         for (int i=0;i<=20;i++)
         {
@@ -77,8 +82,38 @@ double opticalCaliper::mmRead()
 {
     return (double)((const1 - this->read()) * const2);
 }
+                    
+double opticalCaliper::mmReadInt()
+{
+    return (double)((const1 - this->reading) * const2);
+}
 
 double opticalCaliper::inRead()
 {
     return (double)(this->mmRead()/25.4);
+}
+
+/**
+ *  Each time an interrupt event occours on the clockPin
+ *  this function is called. If i'm at the firs clock pulse
+ *  I can start collecting bit from LSB to MSB until the last
+ *  clock pulse occurs
+ */
+void opticalCaliper::readInterrupt()
+{
+    if(micros() - prev_time > break_time) //se mi trovo al primo impulso del treno
+    {
+        prev_time = micros();
+        
+        if(digitalRead(dataPin = 1))
+            bitSet(this->reading_temp, counter);
+        
+        this->counter++;
+        
+    }
+    else
+    {
+        this->counter = 0;
+        this->reading = this->reading_temp;
+    }
 }
