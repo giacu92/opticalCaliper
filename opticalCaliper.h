@@ -12,7 +12,7 @@
 #include "Arduino.h"
 
 #define const1 494914
-#define const2 99.22e-4
+#define const2 99.22e-4 //calibration constant
 
 class opticalCaliper {
 
@@ -20,28 +20,19 @@ private:
     int clockPin = 0;   // default clockPin = 4
     int dataPin  = 0;   // default dataPin  = 5
     int32_t reading = 0x00;
-    int32_t reading_temp = 0x00;    // to avoid reading value during conversion
     
-    unsigned long prev_time  = 0;
-    unsigned long break_time = 0;
-    int counter = 0;
+    double toMillimeter(int32_t data);
     
 public:
     opticalCaliper();
     opticalCaliper(int ckPin, int DataPin);
-    
-    void readInterrupt(void);
     
     void setClockPin(int ckPin  );
     void setDataPin (int DataPin);
     int  getClockPin(void);
     int  getDataPin (void);
     
-    int32_t read(void);    // returns the read bytes
-    
-    double mmRead (void);    // returns the read value in millimeters
-    double inRead (void);    // returns the read value in inches
-    double mmReadInt(void);
+    double read(void);    // returns the read value in millimeters
 };
 
 //static void readInterrupt(void);

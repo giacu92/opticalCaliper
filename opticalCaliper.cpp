@@ -10,8 +10,9 @@
 
 opticalCaliper::opticalCaliper()
 {
-    pinMode(clockPin, INPUT);
+    pinMode(clockPin, OUTPUT);
     pinMode(dataPin,  OUTPUT);
+    digitalWrite(clockPin, LOW); // mi assicuro che il clock sia basso
     
     this->clockPin = 4;
     this->dataPin  = 5;
@@ -47,69 +48,34 @@ int opticalCaliper::getDataPin(void)
     return this->dataPin;
 }
 
-int32_t opticalCaliper::read(void)
+double opticalCaliper::toMillimeter(int32_t data)
 {
-    this->reading = 0; // azzeramanto
-    unsigned long tempMicros = micros();
+    return (double)((const1 - data) * const2);
+}
+
+double opticalCaliper::read(void)
+{
+    this->reading = 0; //azzeramanto
+    unsigned long tempMicros = 0;
     
-    do{}    while(digitalRead(clockPin) == LOW);
-    
-    if(micros() - tempMicros > break_time) // se mi trovo al primo impulso del treno avvio la lettura altrimenti salto
+    for (int i=0; i<=20; i++)
     {
-        for (int i=0;i<=20;i++)
+        tempMicros = micros();
+        //alzo il fronte di clock sul pin di clock
+        digitalWrite(clockPin, HIGH);
+        _delay_us(1);   //attendo 1us per stabilizzare il clock
+        
+        //leggo il bit in ingresso e setto il risultato
+        if (digitalRead(dataPin) == HIGH)
         {
-            do{}while(digitalRead(clockPin) == HIGH);      // alla fine dell'impulso di clock leggo quello di data
-            if(digitalRead(dataPin) == 1)
-            {
-                bitSet(reading, i);
-            }
-            do{}    while(digitalRead(clockPin) == LOW);       // attendo il prossimo impulso di clock
+            bitSet(reading, i);
         }
-        //value2 = (494914 - reading) / 100.00 * 0.9922;
-        return this->reading;
-    }  
-    else
-    {
-        read();
-    }
-}
-
-double opticalCaliper::mmRead()
-{
-    return (double)((const1 - this->read()) * const2);
-}
-                    
-double opticalCaliper::mmReadInt()
-{
-    return (double)((const1 - this->reading) * const2);
-}
-
-double opticalCaliper::inRead()
-{
-    return (double)(this->mmRead()/25.4);
-}
-
-/**
- *  Each time an interrupt event occours on the clockPin
- *  this function is called. If i'm at the firs clock pulse
- *  I can start collecting bit from LSB to MSB until the last
- *  clock pulse occurs
- */
-void opticalCaliper::readInterrupt()
-{
-    if(micros() - prev_time > break_time) //se mi trovo al primo impulso del treno
-    {
-        prev_time = micros();
         
-        if(digitalRead(dataPin = 1))
-            bitSet(this->reading_temp, counter);
-        
-        this->counter++;
-        
+        digitalWrite(clockPin, LOW);
+        _delay_us(1);
+        do{ }    while (micros()-tempMicros < 13);  //attendo finchè non ho completato un ciclo di clock (freq ~77KHz -> 13us)
     }
-    else
-    {
-        this->counter = 0;
-        this->reading = this->reading_temp;
-    }
+    
+    return this->toMillimeter(reading);
+        
 }
