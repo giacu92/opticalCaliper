@@ -10,22 +10,32 @@
 
 opticalCaliper::opticalCaliper()
 {
-    pinMode(clockPin, OUTPUT);
-    pinMode(dataPin,  OUTPUT);
-    digitalWrite(clockPin, LOW); // mi assicuro che il clock sia basso
-    
     this->clockPin = 4;
     this->dataPin  = 5;
     
-    this->break_time = 3000;
+    pinMode(clockPin, OUTPUT);
+    pinMode(dataPin,  OUTPUT);
+    digitalWrite(clockPin, LOW); // mi assicuro che il clock sia basso
 }
 
 opticalCaliper::opticalCaliper(int ckPin, int DataPin)
 {
-    opticalCaliper();
-    
     this->clockPin = ckPin;
     this->dataPin  = DataPin;
+    
+    pinMode(this->clockPin, OUTPUT);
+    pinMode(this->dataPin,  OUTPUT);
+    digitalWrite(this->clockPin, LOW); // mi assicuro che il clock sia basso
+}
+
+opticalCaliper::opticalCaliper(int ckPin, int DataPin1, int DataPin2)
+{
+    #define DUAL_CALIPER
+    
+    opticalCaliper(ckPin, DataPin1);
+    this->dataPin2 = DataPin2;
+    
+    pinMode(this->dataPin2, OUTPUT);
 }
 
 void opticalCaliper::setClockPin(int ckPin)
@@ -53,12 +63,13 @@ double opticalCaliper::toMillimeter(int32_t data)
     return (double)((const1 - data) * const2);
 }
 
-double opticalCaliper::read(void)
+double* opticalCaliper::read(void)
 {
     this->reading = 0; //azzeramanto
     unsigned long tempMicros = 0;
+    double values[2] = {0, 0};
     
-    for (int i=0; i<=20; i++)
+    for (int i=0; i<32; i++)
     {
         tempMicros = micros();
         //alzo il fronte di clock sul pin di clock
@@ -71,11 +82,21 @@ double opticalCaliper::read(void)
             bitSet(reading, i);
         }
         
+        #ifdef DUAL_CALIPER
+            if (digitalRead(this->dataPin2) == HIGH)
+            {
+                bitSet(reading2, i);
+            }
+        #endif
+        
         digitalWrite(clockPin, LOW);
         _delay_us(1);
         do{ }    while (micros()-tempMicros < 13);  //attendo finchè non ho completato un ciclo di clock (freq ~77KHz -> 13us)
     }
     
-    return this->toMillimeter(reading);
+    values[0] = double(reading );
+    values[1] = double(reading2);
+    
+    return values; // ritorno il puntatore all'array
         
 }
