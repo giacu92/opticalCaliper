@@ -10,32 +10,29 @@
 #define opticalCaliper_h
 
 #include "Arduino.h"
-
-#define const1 494914
-#define const2 99.22e-4 //calibration constant
+//#define DEBUG_MODE
 
 class opticalCaliper {
 
 private:
-    int clockPin = 0;   // default clockPin = 4
-    int dataPin  = 0;   // default dataPin  = 5
-    int dataPin2 = 0;
-    int32_t reading  = 0x00;
-    int32_t reading2 = 0x00;
+    float calibration_factor = 0.992;
+    //int32_t offset_factor    = 0;
     
-    double toMillimeter(int32_t data);
+    int clockPin = 4;   // default clockPin = 4
+    int dataPin  = 5;   // default dataPin  = 5
+    int reading  = 0;
     
 public:
     opticalCaliper();
-    opticalCaliper(int ckPin, int DataPin);
-    opticalCaliper(int ckPin, int DataPin1, int DataPin2);
     
+    void begin(int ckPin, int DataPin);
     void setClockPin(int ckPin  );
     void setDataPin (int DataPin);
+    void setCalibration(float cal_factor);
     int  getClockPin(void);
     int  getDataPin (void);
     
-    double* read(void);    // returns the read value in millimeters
+    int read(void);    // returns the read value in millimeters
 };
 
 //static void readInterrupt(void);

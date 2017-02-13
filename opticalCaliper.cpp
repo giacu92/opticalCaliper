@@ -10,32 +10,16 @@
 
 opticalCaliper::opticalCaliper()
 {
-    this->clockPin = 4;
-    this->dataPin  = 5;
-    
-    pinMode(clockPin, OUTPUT);
-    pinMode(dataPin,  OUTPUT);
-    digitalWrite(clockPin, LOW); // mi assicuro che il clock sia basso
 }
 
-opticalCaliper::opticalCaliper(int ckPin, int DataPin)
+void opticalCaliper::begin(int ckPin, int DataPin)
 {
     this->clockPin = ckPin;
     this->dataPin  = DataPin;
     
     pinMode(this->clockPin, OUTPUT);
-    pinMode(this->dataPin,  OUTPUT);
+    pinMode(this->dataPin , INPUT );
     digitalWrite(this->clockPin, LOW); // mi assicuro che il clock sia basso
-}
-
-opticalCaliper::opticalCaliper(int ckPin, int DataPin1, int DataPin2)
-{
-    #define DUAL_CALIPER
-    
-    opticalCaliper(ckPin, DataPin1);
-    this->dataPin2 = DataPin2;
-    
-    pinMode(this->dataPin2, OUTPUT);
 }
 
 void opticalCaliper::setClockPin(int ckPin)
@@ -48,6 +32,11 @@ void opticalCaliper::setDataPin(int DataPin)
     this->dataPin = DataPin;
 }
 
+void opticalCaliper::setCalibration(float cal_factor)
+{
+    this->calibration_factor = cal_factor;
+}
+
 int opticalCaliper::getClockPin(void)
 {
     return this->clockPin;
@@ -58,45 +47,46 @@ int opticalCaliper::getDataPin(void)
     return this->dataPin;
 }
 
-double opticalCaliper::toMillimeter(int32_t data)
+int opticalCaliper::read(void)
 {
-    return (double)((const1 - data) * const2);
-}
-
-double* opticalCaliper::read(void)
-{
-    this->reading = 0; //azzeramanto
     unsigned long tempMicros = 0;
-    double values[2] = {0, 0};
+    this->reading = 0x00;
     
     for (int i=0; i<32; i++)
     {
         tempMicros = micros();
         //alzo il fronte di clock sul pin di clock
-        digitalWrite(clockPin, HIGH);
-        _delay_us(1);   //attendo 1us per stabilizzare il clock
+        digitalWrite(this->clockPin, HIGH);
+        //_delay_us(2);   //attendo 2us per stabilizzare il clock
+        delayMicroseconds(10);
         
         //leggo il bit in ingresso e setto il risultato
-        if (digitalRead(dataPin) == HIGH)
+        if (digitalRead(this->dataPin) == HIGH)
         {
-            bitSet(reading, i);
+            #ifdef DEBUG_MODE
+                Serial.print(digitalRead(this->dataPin));
+                Serial.print(",");
+                //Serial.println(this->reading, "DEC");
+            #endif
+            bitSet(this->reading, i);
         }
-        
-        #ifdef DUAL_CALIPER
-            if (digitalRead(this->dataPin2) == HIGH)
-            {
-                bitSet(reading2, i);
-            }
+        #ifdef DEBUG_MODE
+            else
+                Serial.print("0,");
         #endif
         
+        delayMicroseconds(10);
         digitalWrite(clockPin, LOW);
-        _delay_us(1);
-        do{ }    while (micros()-tempMicros < 13);  //attendo finchè non ho completato un ciclo di clock (freq ~77KHz -> 13us)
+        //delayMicroseconds(100);
+        while (micros()-tempMicros < 100)
+        {
+            delayMicroseconds(10);
+            //attendo finchè non ho completato un ciclo di clock (freq ~77KHz -> 13us)
+        }
     }
+    #ifdef DEBUG_MODE
+        Serial.println("");
+    #endif
     
-    values[0] = double(reading );
-    values[1] = double(reading2);
-    
-    return values; // ritorno il puntatore all'array
-        
+    return  this->reading * this->calibration_factor; // ritorno il puntatore all'array
 }
