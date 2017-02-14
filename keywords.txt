@@ -13,10 +13,10 @@ LTC236X	KEYWORD1
 #######################################
 
 opticalCaliper	KEYWORD2
-serClockPin	KEYWORD2
+setClockPin	KEYWORD2
 setDataPin	KEYWORD2
+setCalibration	KEYWORD2
 getClockPin	KEYWORD2
 getDataPin	KEYWORD2
 read	KEYWORD2
-mmRead	KEYWORD2
-inRead	KEYWORD2
+
