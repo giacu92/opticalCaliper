@@ -1,34 +1,25 @@
 #include <opticalCaliper.h>
 
-int clkPin  = 4;
-int dataPin = 5;
+#define clkPin  4
+#define dataPin 5
 
-opticalCaliper caliper(clkPin, dataPin);
-// opticalCaliper caliper(); //<-- can also use default declaration
+opticalCaliper caliper;
 
 void setup()
 {
+  caliper.begin(clkPin, dataPin);
   Serial.begin(9600);
 }
 
 void loop()
 {
   // Reading values:
-  double mmValue = caliper.mmRead();
-  double inValue = caliper.inRead();
-  int32_t data   = caliper.read();
+  float reading = caliper.read();
 
   // Printing values:
   Serial.print("distance in mm: ");
-  Serial.print(mmValue);
+  Serial.print(reading/100.00);
   Serial.println(" mm");
-  
-  Serial.print("distance in in: ");
-  Serial.print(inValue);
-  Serial.println(" in");
-
-  Serial.print("bytes read: ");
-  Serial.println(data, BIN);
 
   delay(1000);
 }
