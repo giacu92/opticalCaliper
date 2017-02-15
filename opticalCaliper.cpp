@@ -47,7 +47,7 @@ int opticalCaliper::getDataPin(void)
     return this->dataPin;
 }
 
-int opticalCaliper::read(void)
+int32_t opticalCaliper::read(void)
 {
     unsigned long tempMicros = 0;
     this->reading = 0x00;
@@ -57,7 +57,6 @@ int opticalCaliper::read(void)
         tempMicros = micros();
         //alzo il fronte di clock sul pin di clock
         digitalWrite(this->clockPin, HIGH);
-        //_delay_us(2);   //attendo 2us per stabilizzare il clock
         delayMicroseconds(10);
         
         //leggo il bit in ingresso e setto il risultato
@@ -88,5 +87,36 @@ int opticalCaliper::read(void)
         Serial.println("");
     #endif
     
-    return  this->reading * this->calibration_factor; // ritorno il puntatore all'array
+    return  (this->reading-this->calibration_offset) * this->calibration_factor; // ritorno il puntatore all'array
+}
+
+void opticalCaliper::setZero()
+{
+    unsigned long tempMicros = 0;
+    this->reading = 0x00;
+    
+    for (int i=0; i<32; i++)
+    {
+        tempMicros = micros();
+        //alzo il fronte di clock sul pin di clock
+        digitalWrite(this->clockPin, HIGH);
+        delayMicroseconds(10);
+        
+        //leggo il bit in ingresso e setto il risultato
+        if (digitalRead(this->dataPin) == HIGH)
+        {
+            bitSet(this->reading, i);
+        }
+        
+        delayMicroseconds(10);
+        digitalWrite(clockPin, LOW);
+        //delayMicroseconds(100);
+        while (micros()-tempMicros < 100)
+        {
+            delayMicroseconds(10);
+            //attendo finchè non ho completato un ciclo di clock (freq ~77KHz -> 13us)
+        }
+    }
+
+    this->calibration_offset = reading;
 }
