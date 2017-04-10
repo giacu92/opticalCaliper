@@ -74,7 +74,7 @@ int32_t opticalCaliper::read(void)
             bitSet(this->reading, i);
         }
         
-        delayMicroseconds(10);
+        //delayMicroseconds(10);
         digitalWrite(clockPin, LOW);
         //delayMicroseconds(100);
         while (micros()-tempMicros < 100)
