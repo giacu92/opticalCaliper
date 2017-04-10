@@ -18,7 +18,7 @@ void opticalCaliper::begin(int ckPin, int DataPin)
     this->dataPin  = DataPin;
     
     pinMode(this->clockPin, OUTPUT);
-    pinMode(this->dataPin , INPUT );
+    pinMode(this->dataPin , INPUT_PULLUP );
     digitalWrite(this->clockPin, LOW); // mi assicuro che il clock sia basso
 }
 
@@ -55,24 +55,24 @@ int32_t opticalCaliper::read(void)
     for (int i=0; i<32; i++)
     {
         tempMicros = micros();
+        int lettura_positiva = 0;
         //alzo il fronte di clock sul pin di clock
         digitalWrite(this->clockPin, HIGH);
-        delayMicroseconds(10);
+        //delayMicroseconds(10);
         
         //leggo il bit in ingresso e setto il risultato
-        if (digitalRead(this->dataPin) == HIGH)
+        
+        for (int j = 0; j<5; j++)
         {
-            #ifdef DEBUG_MODE
-                Serial.print(digitalRead(this->dataPin));
-                Serial.print(",");
-                //Serial.println(this->reading, "DEC");
-            #endif
+            if (digitalRead(this->dataPin) == HIGH)
+            {
+                lettura_positiva += 1;
+            }
+        }
+        if (lettura_positiva >= 3)
+        {
             bitSet(this->reading, i);
         }
-        #ifdef DEBUG_MODE
-            else
-                Serial.print("0,");
-        #endif
         
         delayMicroseconds(10);
         digitalWrite(clockPin, LOW);
